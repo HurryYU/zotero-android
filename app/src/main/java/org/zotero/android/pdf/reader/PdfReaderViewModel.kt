@@ -145,6 +145,7 @@ import org.zotero.android.pdf.data.PdfReaderThemeDecider
 import org.zotero.android.pdf.pdffilter.data.PdfFilterArgs
 import org.zotero.android.pdf.pdffilter.data.PdfFilterResult
 import org.zotero.android.pdf.reader.AnnotationKey.Kind
+import org.zotero.android.pdf.reader.translate.dialog.PdfTranslateDialog
 import org.zotero.android.pdf.reader.pdfsearch.data.OnPdfReaderSearch
 import org.zotero.android.pdf.reader.pdfsearch.data.PdfReaderSearchArgs
 import org.zotero.android.pdf.reader.pdfsearch.data.PdfReaderSearchResultSelected
@@ -157,6 +158,7 @@ import org.zotero.android.pdf.reader.sidebar.data.ThumbnailPreviewCacheUpdatedEv
 import org.zotero.android.pdf.reader.sidebar.data.ThumbnailPreviewManager
 import org.zotero.android.pdf.reader.sidebar.data.ThumbnailPreviewMemoryCache
 import org.zotero.android.pdf.reader.sidebar.data.ThumbnailsPreviewFileCache
+import org.zotero.android.pdf.reader.translate.repository.TranslateRepository
 import org.zotero.android.pdf.settings.data.PdfSettingsArgs
 import org.zotero.android.pdf.settings.data.PdfSettingsChangeResult
 import org.zotero.android.screens.tagpicker.data.TagPickerArgs
@@ -249,6 +251,9 @@ class PdfReaderViewModel @Inject constructor(
         val argsEncoded = stateHandle.get<String>(ARG_PDF_SCREEN).require()
         navigationParamsMarshaller.decodeObjectFromBase64(argsEncoded)
     }
+
+    private val translateRepository = TranslateRepository()
+    private val translateDialog = PdfTranslateDialog()
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onPageChangedEvent(event: OnPageChangedEvent) {
@@ -562,7 +567,30 @@ class PdfReaderViewModel @Inject constructor(
                 R.id.pspdf__text_selection_toolbar_item_highlight,
                 Strings.pdf_highlight
             )
+            sourceItems.add(0, PopupToolbarMenuItem(
+                org.zotero.android.R.id.pspdf__text_selection_toolbar_item_translate,
+                Strings.pdf_translate
+            ))
             toolbar.menuItems = sourceItems
+            toolbar.setOnPopupToolbarItemClickedListener {
+                if (it.id == org.zotero.android.R.id.pspdf__text_selection_toolbar_item_translate) {
+                    val selectedText = this.pdfFragment.textSelection?.text?.replace("\r\n","") ?: ""
+                    showTranslateDialog(selectedText)
+                    toolbar.dismiss()
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
+
+    private fun showTranslateDialog(sourceText: String) {
+        translateDialog.setSourceText(sourceText)
+        translateDialog.show(fragmentManager, null)
+        viewModelScope.launch {
+            val resultText = translateRepository.getTranslateText(sourceText)
+            translateDialog.setTranslateResult(resultText)
         }
     }
 

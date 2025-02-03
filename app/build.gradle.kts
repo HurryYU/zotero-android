@@ -1,4 +1,4 @@
-import com.github.triplet.gradle.androidpublisher.ResolutionStrategy
+//import com.github.triplet.gradle.androidpublisher.ResolutionStrategy
 import java.io.ByteArrayOutputStream
 
 plugins {
@@ -6,7 +6,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     kotlin("plugin.serialization")
-    id("com.github.triplet.play") version "3.7.0"
+//    id("com.github.triplet.play") version "3.7.0"
     id("dagger.hilt.android.plugin")
     id("realm-android")
     id("kotlin-parcelize")
@@ -44,12 +44,13 @@ android {
         manifestPlaceholders["enableCrashReporting"] = false
 
         ndk {
-            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            abiFilters += listOf("arm64-v8a")
+//            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
     }
     signingConfigs {
         create("release") {
-            storeFile = rootProject.file("zotero.release.keystore")
+            storeFile = rootProject.file("zotero.release.jks")
 
             if (rootProject.file("keystore-secrets.txt").exists()) {
                 val secrets: List<String> = rootProject
@@ -130,11 +131,11 @@ android {
     }
 }
 
-play {
-    track.set("internal")
-    defaultToAppBundles.set(true)
-    resolutionStrategy.set(ResolutionStrategy.AUTO)
-}
+//play {
+//    track.set("internal")
+//    defaultToAppBundles.set(true)
+//    resolutionStrategy.set(ResolutionStrategy.AUTO)
+//}
 
 dependencies {
 

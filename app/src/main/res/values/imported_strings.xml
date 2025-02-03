@@ -212,6 +212,7 @@
     <string name="pdf.deleted_message">This document has been deleted. Do you want to restore it?</string>
     <string name="pdf.line_width_point">%0.1f pt</string>
     <string name="pdf.highlight">Highlight</string>
+    <string name="pdf.translate">翻译</string>
     <string name="pdf.annotation_share.image.share">Share image</string>
     <string name="pdf.annotation_share.image.medium">Medium</string>
     <string name="pdf.annotation_share.image.large">Large</string>
